@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace DatabaseAggregator.Models;
 
-namespace DatabaseAggregator.Models;
-
-public partial class Position
+public class Position
 {
     public string Name { get; set; } = null!;
 

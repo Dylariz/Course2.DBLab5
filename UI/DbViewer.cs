@@ -1,81 +1,113 @@
-﻿using System.Reflection;
-using DatabaseAggregator;
+﻿using DatabaseAggregator;
 using DatabaseAggregator.Context;
+using UI.Settings;
 
-namespace UI
+namespace UI;
+
+public partial class DbViewer : Form
 {
-    public partial class DbViewer : Form
+    private MercenaryDatabaseContext? _dbContext;
+    private DbContextData? _dbContextData;
+
+    public DbViewer()
     {
-        private Type _dbContextType = typeof(MercenaryDatabaseContext);
-        private MercenaryDatabaseContext? _dbContext;
-        private DbContextParams _dbContextParams;
-        
-        public DbViewer()
+        InitializeComponent();
+    }
+
+    private void connectButton_Click(object sender, EventArgs e)
+    {
+        using var dialog = new ConnectionDialog(new SettingsManager(Path.Combine("Settings", "settings.json")));
+
+        if (dialog.ShowDialog() == DialogResult.OK)
         {
-            InitializeComponent();
-            _dbContextParams = new DbContextParams(_dbContextType);
-            _dbContext = null;
-            
-            // Добавляем имена таблиц в ComboBox.
-            if (_dbContextParams.DbSetProperties != null)
+            _dbContext = new MercenaryDatabaseContext(dialog.Server, dialog.Database, dialog.Uid, dialog.Pwd);
+
+
+            if (!_dbContext.Database.CanConnect())
             {
-                foreach (var prop in _dbContextParams.DbSetProperties)
-                {
-                    tableChoiseComboBox.Items.Add(prop.Name);
-                }
-                tableChoiseComboBox.SelectedIndex = 0;
-                tableChoiseComboBox.SelectedIndexChanged += tableChoiseComboBox_SelectedIndexChanged;
+                Reset();
+                MessageBox.Show("Не удалось подключиться к базе данных");
             }
             else
             {
-                MessageBox.Show("Указанный тип не содержит свойств типа DbSet<T>");
-                Application.Exit();
+                _dbContextData = new DbContextData(_dbContext);
+                connectButton.Text = "Переподключение";
+
+                LoadComboBox();
+                tableChoiseComboBox.Enabled = true;
+                tableChoiseComboBox.SelectedIndex = 0;
+                LoadData();
             }
         }
+    }
 
-        private void connectButton_Click(object sender, EventArgs e)
+    private void tableChoiseComboBox_SelectedIndexChanged(object sender, EventArgs e)
+    {
+        if (_dbContext != null)
         {
-            _dbContext ??= new MercenaryDatabaseContext();
             LoadData();
         }
-        
-        private void tableChoiseComboBox_SelectedIndexChanged(object sender, EventArgs e)
-        {
-            LoadData();
-        }
-        
-        private void LoadData()
-        {
-            // Получаем имя таблицы, выбранной в ComboBox.
-            string tableName = tableChoiseComboBox.SelectedItem!.ToString()!;
-            
-            // Получаем свойство типа DbSet<T> с именем tableName.
-            PropertyInfo? dbSetProperty = _dbContextParams.DbSetProperties?.FirstOrDefault(p => p.Name == tableName);
+    }
 
-            if (dbSetProperty == null)
-            {
-                throw new Exception($"Не найдено свойство типа DbSet<T> с именем {tableName}");
-            }
-            
-            // Получаем значение этого свойства.
-            var dbSet = dbSetProperty.GetValue(_dbContext);
-            
-            // Получаем тип элементов этого свойства.
-            var dbSetType = dbSetProperty.PropertyType.GenericTypeArguments[0];
-            
-            // Получаем метод ToList() для этого типа.
-            MethodInfo? toListMethod = typeof(Enumerable).GetMethod("ToList")?.MakeGenericMethod(dbSetType);
-            
-            if (toListMethod == null)
-            {
-                throw new Exception($"Не найден метод ToList() для типа {dbSetType}");
-            }
-            
-            // Вызываем метод ToList() для свойства dbSet.
-            var list = toListMethod.Invoke(null, new[] {dbSet});
-            
-            // Заполняем DataGridView.
-            tableDataGrid.DataSource = list;
+    private void tableDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+    {
+        if (_dbContext != null)
+        {
+            _dbContext.SaveChanges();
+        }
+    }
+
+    private void ConnectionCheckTimer_Tick(object sender, EventArgs e)
+    {
+        if (_dbContext != null && !_dbContext.Database.CanConnect())
+        {
+            Reset();
+            MessageBox.Show("Соединение с базой данных было разорвано");
+        }
+    }
+
+    private void DbViewer_FormClosing(object sender, FormClosingEventArgs e)
+    {
+        if (_dbContext != null)
+        {
+            _dbContext.Dispose();
+        }
+    }
+
+    private void Reset()
+    {
+        _dbContext = null;
+        _dbContextData = null;
+        tableChoiseComboBox.Enabled = false;
+        tableChoiseComboBox.Items.Clear();
+        tableDataGrid.DataSource = null;
+        connectButton.Text = "Подключение";
+    }
+
+    private void LoadComboBox()
+    {
+        tableChoiseComboBox.Items.Clear();
+        foreach (var tableName in _dbContextData!.DataTable.Keys)
+        {
+            tableChoiseComboBox.Items.Add(tableName);
+        }
+    }
+
+    private void LoadData()
+    {
+        // Получаем имя таблицы, выбранной в ComboBox.
+        string tableName = tableChoiseComboBox.SelectedItem!.ToString()!;
+
+        // Получаем данные из таблицы.
+        var source = _dbContextData!.DataTable[tableName];
+
+        // Заполняем DataGridView.
+        tableDataGrid.DataSource = source;
+
+        // Скрываем невидимые столбцы.
+        foreach (var columnName in _dbContextData.UnvisibleProperties[tableName])
+        {
+            tableDataGrid.Columns[columnName].Visible = false;
         }
     }
 }

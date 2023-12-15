@@ -33,6 +33,7 @@
             this.tableNameLabel = new System.Windows.Forms.Label();
             this.connectButton = new System.Windows.Forms.Button();
             this.tableChoiseComboBox = new System.Windows.Forms.ComboBox();
+            this.connectionCheckTimer = new System.Windows.Forms.Timer();
             ((System.ComponentModel.ISupportInitialize)(this.tableDataGrid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -44,6 +45,7 @@
             this.tableDataGrid.RowTemplate.Height = 33;
             this.tableDataGrid.Size = new System.Drawing.Size(1583, 891);
             this.tableDataGrid.TabIndex = 0;
+            this.tableDataGrid.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.tableDataGrid_CellValueChanged);
             // 
             // tableNameLabel
             // 
@@ -61,7 +63,7 @@
             this.connectButton.Name = "connectButton";
             this.connectButton.Size = new System.Drawing.Size(315, 79);
             this.connectButton.TabIndex = 2;
-            this.connectButton.Text = "Соеденить с БД";
+            this.connectButton.Text = "Подключение";
             this.connectButton.UseVisualStyleBackColor = true;
             this.connectButton.Click += new System.EventHandler(this.connectButton_Click);
             // 
@@ -69,24 +71,35 @@
             // 
             this.tableChoiseComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.tableChoiseComboBox.FormattingEnabled = true;
-            this.tableChoiseComboBox.Location = new System.Drawing.Point(310, 35);
+            this.tableChoiseComboBox.Location = new System.Drawing.Point(290, 35);
             this.tableChoiseComboBox.Name = "tableChoiseComboBox";
             this.tableChoiseComboBox.Size = new System.Drawing.Size(496, 59);
             this.tableChoiseComboBox.TabIndex = 3;
+            tableChoiseComboBox.Enabled = false;
+            this.tableChoiseComboBox.SelectedIndexChanged += new System.EventHandler(this.tableChoiseComboBox_SelectedIndexChanged);
             // 
             // DbViewer
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1620, 1037);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
+            this.MaximizeBox = false;
             this.Controls.Add(this.tableChoiseComboBox);
             this.Controls.Add(this.connectButton);
             this.Controls.Add(this.tableNameLabel);
             this.Controls.Add(this.tableDataGrid);
             this.Name = "DbViewer";
             this.Text = "DbViewer";
-            ((System.ComponentModel.ISupportInitialize)(this.tableDataGrid)).EndInit();
             this.ResumeLayout(false);
+            this.FormClosing += DbViewer_FormClosing;
+            ((System.ComponentModel.ISupportInitialize)(this.tableDataGrid)).EndInit();
+            //
+            // connectionCheckTimer
+            //
+            connectionCheckTimer.Interval = 5000; // Задаем интервал в 5 секунд
+            connectionCheckTimer.Tick += ConnectionCheckTimer_Tick; // Подписываемся на событие Tick
+            connectionCheckTimer.Start(); // Запускаем таймер
         }
 
         private System.Windows.Forms.ComboBox tableChoiseComboBox;
@@ -96,6 +109,8 @@
         private System.Windows.Forms.Label tableNameLabel;
 
         private System.Windows.Forms.DataGridView tableDataGrid;
+        
+        private System.Windows.Forms.Timer connectionCheckTimer;
 
         #endregion
     }

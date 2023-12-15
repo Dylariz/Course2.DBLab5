@@ -1,0 +1,15 @@
+{
+    "Logging": {
+        "LogLevel": {
+            "Default": "Debug",
+            "System": "Information",
+            "Microsoft": "Information"
+        }
+    },
+    "ConnectionSettings": {
+        "Server": "localhost",
+        "Database": "",
+        "User": "root",
+        "Password": ""
+    }
+}

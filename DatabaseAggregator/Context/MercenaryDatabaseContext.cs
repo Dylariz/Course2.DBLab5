@@ -1,33 +1,33 @@
-﻿using System;
-using System.Collections.Generic;
-using DatabaseAggregator.Models;
+﻿using DatabaseAggregator.Models;
 using Microsoft.EntityFrameworkCore;
-using Pomelo.EntityFrameworkCore.MySql.Scaffolding.Internal;
 
 namespace DatabaseAggregator.Context;
 
-public partial class MercenaryDatabaseContext : DbContext
+public sealed class MercenaryDatabaseContext : DbContext
 {
-    public MercenaryDatabaseContext() { }
-    public MercenaryDatabaseContext(DbContextOptions<MercenaryDatabaseContext> options)
-        : base(options) { }
+    private readonly string _connectionString;
 
-    public virtual DbSet<Mission> Missions { get; set; }
+    public MercenaryDatabaseContext(string server, string database, string uid, string pwd)
+    {
+        _connectionString = $"server={server};database={database};uid={uid};pwd={pwd};";
+    }
 
-    public virtual DbSet<PersonalEquipment> PersonalEquipments { get; set; }
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) =>
+        optionsBuilder.UseMySql(_connectionString, ServerVersion.Parse("10.4.28-mariadb"));
+    
+    public DbSet<Mission> Missions { get; set; } = null!;
 
-    public virtual DbSet<Position> Positions { get; set; }
+    public DbSet<PersonalEquipment> PersonalEquipments { get; set; } = null!;
 
-    public virtual DbSet<Regiment> Regiments { get; set; }
+    public DbSet<Position> Positions { get; set; } = null!;
 
-    public virtual DbSet<RegimentEquipment> RegimentEquipments { get; set; }
+    public DbSet<Regiment> Regiments { get; set; } = null!;
 
-    public virtual DbSet<Squad> Squads { get; set; }
+    public DbSet<RegimentEquipment> RegimentEquipments { get; set; } = null!;
 
-    public virtual DbSet<Staff> Staff { get; set; }
+    public DbSet<Squad> Squads { get; set; } = null!;
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseMySql("server=localhost;database=mercenary;uid=root;pwd=123", ServerVersion.Parse("10.4.28-mariadb"));
+    public DbSet<Staff> Staff { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -130,7 +130,7 @@ public partial class MercenaryDatabaseContext : DbContext
                 .HasForeignKey(d => d.CommanderId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("regiment_ibfk_2");
-
+            
             entity.HasOne(d => d.Mission).WithMany(p => p.Regiments)
                 .HasForeignKey(d => d.MissionId)
                 .HasConstraintName("regiment_ibfk_1");
@@ -259,9 +259,5 @@ public partial class MercenaryDatabaseContext : DbContext
                 .HasForeignKey(d => d.SquadId)
                 .HasConstraintName("staff_ibfk_2");
         });
-
-        OnModelCreatingPartial(modelBuilder);
     }
-
-    partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }

@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace DatabaseAggregator.Models;
+﻿namespace DatabaseAggregator.Models;
 
 /// <summary>
 /// Служащие
 /// </summary>
-public partial class Staff
+public class Staff
 {
     public int Id { get; set; }
 

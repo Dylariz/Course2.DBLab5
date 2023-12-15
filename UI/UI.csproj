@@ -18,4 +18,10 @@
       <ProjectReference Include="..\DatabaseAggregator\DatabaseAggregator.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Update="Settings\settings.json">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

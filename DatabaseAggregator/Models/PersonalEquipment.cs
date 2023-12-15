@@ -1,9 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿namespace DatabaseAggregator.Models;
 
-namespace DatabaseAggregator.Models;
-
-public partial class PersonalEquipment
+public class PersonalEquipment
 {
     public int Id { get; set; }
 
