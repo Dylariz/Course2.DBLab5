@@ -49,11 +49,11 @@ public partial class DbViewer : Form
         }
     }
 
-    private void tableDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+    private async void tableDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
     {
         if (_dbContext != null)
         {
-            _dbContext.SaveChanges();
+            await _dbContext.SaveChangesAsync();
         }
     }
 
@@ -68,14 +68,12 @@ public partial class DbViewer : Form
 
     private void DbViewer_FormClosing(object sender, FormClosingEventArgs e)
     {
-        if (_dbContext != null)
-        {
-            _dbContext.Dispose();
-        }
+        _dbContext?.Dispose();
     }
 
     private void Reset()
     {
+        _dbContext?.Dispose();
         _dbContext = null;
         _dbContextData = null;
         tableChoiseComboBox.Enabled = false;
