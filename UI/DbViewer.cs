@@ -8,6 +8,7 @@ public partial class DbViewer : Form
 {
     private MercenaryDatabaseContext? _dbContext;
     private DbContextData? _dbContextData;
+    private bool _dataChanged;
 
     public DbViewer()
     {
@@ -49,20 +50,27 @@ public partial class DbViewer : Form
         }
     }
 
-    private async void tableDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
+    private void tableDataGrid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
     {
         if (_dbContext != null)
         {
-            await _dbContext.SaveChangesAsync();
+            _dataChanged = true;
         }
     }
 
-    private void ConnectionCheckTimer_Tick(object sender, EventArgs e)
+    private async void ConnectionCheckTimer_Tick(object sender, EventArgs e)
     {
-        if (_dbContext != null && !_dbContext.Database.CanConnect())
+        if (_dbContext != null)
         {
-            Reset();
-            MessageBox.Show("Соединение с базой данных было разорвано");
+            if (!await _dbContext.Database.CanConnectAsync())
+            {
+                Reset();
+                MessageBox.Show("Соединение с базой данных было разорвано");
+            }
+            else if(_dataChanged)
+            {
+                await _dbContext.SaveChangesAsync();
+            }
         }
     }
 
