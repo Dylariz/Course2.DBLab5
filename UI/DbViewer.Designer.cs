@@ -49,7 +49,8 @@
             // 
             // tableNameLabel
             // 
-            this.tableNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.875F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.tableNameLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 19.875F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.tableNameLabel.Location = new System.Drawing.Point(41, 30);
             this.tableNameLabel.Name = "tableNameLabel";
             this.tableNameLabel.Size = new System.Drawing.Size(321, 75);
@@ -58,7 +59,8 @@
             // 
             // connectButton
             // 
-            this.connectButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.connectButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point,
+                ((byte)(204)));
             this.connectButton.Location = new System.Drawing.Point(1262, 26);
             this.connectButton.Name = "connectButton";
             this.connectButton.Size = new System.Drawing.Size(315, 79);
@@ -69,7 +71,8 @@
             // 
             // tableChoiseComboBox
             // 
-            this.tableChoiseComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.tableChoiseComboBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 16.125F, System.Drawing.FontStyle.Regular,
+                System.Drawing.GraphicsUnit.Point, ((byte)(204)));
             this.tableChoiseComboBox.FormattingEnabled = true;
             this.tableChoiseComboBox.Location = new System.Drawing.Point(290, 35);
             this.tableChoiseComboBox.Name = "tableChoiseComboBox";
@@ -109,7 +112,7 @@
         private System.Windows.Forms.Label tableNameLabel;
 
         private System.Windows.Forms.DataGridView tableDataGrid;
-        
+
         private System.Windows.Forms.Timer connectionCheckTimer;
 
         #endregion
