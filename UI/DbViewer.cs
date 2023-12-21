@@ -1,13 +1,13 @@
 ﻿using DatabaseAggregator;
-using DatabaseAggregator.Context;
+using Microsoft.EntityFrameworkCore;
 using UI.Settings;
 
 namespace UI;
 
 public partial class DbViewer : Form
 {
-    private MercenaryDatabaseContext? _dbContext;
     private DbContextData? _dbContextData;
+    private DbContext? _dbContext;
     private bool _dataChanged;
 
     public DbViewer()
@@ -21,19 +21,25 @@ public partial class DbViewer : Form
 
         if (dialog.ShowDialog() == DialogResult.OK)
         {
-            _dbContext = new MercenaryDatabaseContext(dialog.Server, dialog.Database, dialog.Uid, dialog.Pwd);
-
-
-            if (!_dbContext.Database.CanConnect())
+            var modelGenerator = new DatabaseModelGenerator(dialog.Server, dialog.Database, dialog.Uid, dialog.Pwd);
+            if (!modelGenerator.TryGenerate())
             {
                 Reset();
                 MessageBox.Show("Не удалось подключиться к базе данных");
+                return;
+            }
+            
+            _dbContextData = new DbContextData(modelGenerator);
+
+            if (!_dbContextData.DbContext.Database.CanConnect())
+            {
+                Reset();
+                MessageBox.Show("Подключение прервано");
             }
             else
             {
-                _dbContextData = new DbContextData(_dbContext);
                 connectButton.Text = "Переподключение";
-
+                _dbContext = _dbContextData.DbContext;
                 LoadComboBox();
                 tableChoiseComboBox.Enabled = true;
                 tableChoiseComboBox.SelectedIndex = 0;
@@ -111,7 +117,7 @@ public partial class DbViewer : Form
         tableDataGrid.DataSource = source;
 
         // Скрываем невидимые столбцы.
-        foreach (var columnName in _dbContextData.UnvisibleProperties[tableName])
+        foreach (var columnName in _dbContextData.InvisibleProperties[tableName])
         {
             tableDataGrid.Columns[columnName].Visible = false;
         }

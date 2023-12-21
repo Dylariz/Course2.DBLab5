@@ -24,4 +24,8 @@
       </None>
     </ItemGroup>
 
+    <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+      <Exec Command="set folder=&quot;$(TargetDir)DatabaseModel&quot;&#xA;@RD /S /Q %folder%&#xA;mkdir %folder%&#xA;xcopy &quot;$(SolutionDir)DatabaseModel&quot; %folder% /E /Y" />
+    </Target>
+
 </Project>
