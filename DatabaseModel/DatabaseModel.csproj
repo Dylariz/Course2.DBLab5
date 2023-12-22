@@ -19,9 +19,4 @@
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0-beta.2" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Context\" />
-      <Folder Include="Models\" />
-    </ItemGroup>
-
 </Project>

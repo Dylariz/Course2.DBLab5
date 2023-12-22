@@ -71,7 +71,11 @@ public class DatabaseModelGenerator
 
         // Ожидание завершения процесса
         process.WaitForExit();
-
+        
+        // Удаление содержимого Context и Models из DatabaseModel
+        Directory.Delete(Path.Combine("DatabaseModel", "Context"), true);
+        Directory.Delete(Path.Combine("DatabaseModel", "Models"), true);
+        
         // Проверка успешности генерации
         if (process.ExitCode != 0)
         {
