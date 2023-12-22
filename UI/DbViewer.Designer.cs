@@ -95,7 +95,6 @@
             this.Name = "DbViewer";
             this.Text = "DbViewer";
             this.ResumeLayout(false);
-            this.FormClosing += DbViewer_FormClosing;
             ((System.ComponentModel.ISupportInitialize)(this.tableDataGrid)).EndInit();
             //
             // connectionCheckTimer

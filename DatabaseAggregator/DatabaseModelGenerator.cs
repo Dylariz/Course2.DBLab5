@@ -27,6 +27,7 @@ public class DatabaseModelGenerator
         _connectionString = $"server={server};database={database};uid={uid};pwd={pwd};";
         
         DbContextTypeName = $"DatabaseModel.Context.{database}DatabaseContext";
+        IsGenerated = false;
 
         // Проверка существования проекта DatabaseModel
         if (!Directory.Exists("DatabaseModel") || !File.Exists("DatabaseModel/DatabaseModel.csproj"))
@@ -34,7 +35,7 @@ public class DatabaseModelGenerator
             throw new DirectoryNotFoundException("Project DatabaseModel not found");
         }
 
-        _dllPath = Path.Combine("DatabaseModel", "bin", "Release", netVersion, "DatabaseModel.dll");
+        _dllPath = Path.Combine("DatabaseModel", "bin", "Debug", netVersion, "DatabaseModel.dll");
     }
 
     /// <summary>
@@ -61,7 +62,7 @@ public class DatabaseModelGenerator
             {
                 FileName = Path.Combine("DatabaseModel", "scaffoldDB.bat"),
                 Arguments = $"{_server} {_database} {_uid} {_pwd} {_netVersion}",
-                CreateNoWindow = false, // TODO: true
+                CreateNoWindow = true,
                 UseShellExecute = false
             }
         };

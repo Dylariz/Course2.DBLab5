@@ -25,8 +25,8 @@ public class DbContextData
         {
             throw new ArgumentException("Assembly not found");
         }
-        
-        var test = assembly.GetTypes();
+
+        var a = assembly.GetTypes();
 
         var dbContextType = assembly.GetType(dbContextTypeName);
         if (dbContextType == null)

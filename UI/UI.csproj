@@ -6,6 +6,7 @@
         <Nullable>enable</Nullable>
         <UseWindowsForms>true</UseWindowsForms>
         <ImplicitUsings>enable</ImplicitUsings>
+        <RunPostBuildEvent>Always</RunPostBuildEvent>
     </PropertyGroup>
 
     <ItemGroup>
@@ -25,7 +26,7 @@
     </ItemGroup>
 
     <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-      <Exec Command="set folder=&quot;$(TargetDir)DatabaseModel&quot;&#xA;@RD /S /Q %folder%&#xA;mkdir %folder%&#xA;xcopy &quot;$(SolutionDir)DatabaseModel&quot; %folder% /E /Y" />
+      <Exec Command="set folder=&quot;$(TargetDir)DatabaseModel&quot;&#xA;rmdir %folder% /s /q&#xA;mkdir %folder%&#xA;xcopy &quot;$(SolutionDir)DatabaseModel&quot; %folder% /E /Y" />
     </Target>
 
 </Project>

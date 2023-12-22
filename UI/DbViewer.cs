@@ -17,34 +17,43 @@ public partial class DbViewer : Form
 
     private void connectButton_Click(object sender, EventArgs e)
     {
-        using var dialog = new ConnectionDialog(new SettingsManager(Path.Combine("Settings", "settings.json")));
-
-        if (dialog.ShowDialog() == DialogResult.OK)
+        if (_dbContextData == null)
         {
-            var modelGenerator = new DatabaseModelGenerator(dialog.Server, dialog.Database, dialog.Uid, dialog.Pwd);
-            if (!modelGenerator.TryGenerate())
-            {
-                Reset();
-                MessageBox.Show("Не удалось подключиться к базе данных");
-                return;
-            }
-            
-            _dbContextData = new DbContextData(modelGenerator);
+            using var dialog = new ConnectionDialog(new SettingsManager(Path.Combine("Settings", "settings.json")));
 
-            if (!_dbContextData.DbContext.Database.CanConnect())
+            if (dialog.ShowDialog() == DialogResult.OK)
             {
-                Reset();
-                MessageBox.Show("Подключение прервано");
+                var modelGenerator = new DatabaseModelGenerator(dialog.Server, dialog.Database, dialog.Uid, dialog.Pwd);
+                if (!modelGenerator.TryGenerate())
+                {
+                    MessageBox.Show("Не удалось подключиться к базе данных");
+                    return;
+                }
+
+                _dbContextData = new DbContextData(modelGenerator);
             }
             else
             {
-                connectButton.Text = "Переподключение";
-                _dbContext = _dbContextData.DbContext;
-                LoadComboBox();
-                tableChoiseComboBox.Enabled = true;
-                tableChoiseComboBox.SelectedIndex = 0;
-                LoadData();
+                return;
             }
+        }
+
+
+        if (!_dbContextData.DbContext.Database.CanConnect())
+        {
+            Reset();
+            MessageBox.Show("Нет соединения с БД или её структура была изменена");
+        }
+        else
+        {
+            connectionCheckTimer.Start();
+            connectButton.Enabled = false;
+            connectButton.Text = "Переподключение";
+            _dbContext = _dbContextData.DbContext;
+            LoadComboBox();
+            tableChoiseComboBox.Enabled = true;
+            tableChoiseComboBox.SelectedIndex = 0;
+            LoadData();
         }
     }
 
@@ -73,27 +82,20 @@ public partial class DbViewer : Form
                 Reset();
                 MessageBox.Show("Соединение с базой данных было разорвано");
             }
-            else if(_dataChanged)
+            else if (_dataChanged)
             {
                 await _dbContext.SaveChangesAsync();
             }
         }
     }
 
-    private void DbViewer_FormClosing(object sender, FormClosingEventArgs e)
-    {
-        _dbContext?.Dispose();
-    }
-
     private void Reset()
     {
-        _dbContext?.Dispose();
-        _dbContext = null;
-        _dbContextData = null;
+        connectionCheckTimer.Stop();
+        connectButton.Enabled = true;
         tableChoiseComboBox.Enabled = false;
         tableChoiseComboBox.Items.Clear();
         tableDataGrid.DataSource = null;
-        connectButton.Text = "Подключение";
     }
 
     private void LoadComboBox()
